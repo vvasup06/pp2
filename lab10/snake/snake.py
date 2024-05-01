@@ -93,17 +93,35 @@ def kill_wall():
 
 #SCL
 conn = psycopg2.connect(
-	database="snakedata",
-	user='postgres',
-	password='Beka2004',
+	database="snake",
+	user='danya',
+	password='123',
 	host='localhost',
 	port= '5432'
 )
 cursor = conn.cursor()
 conn.autocommit = True
 
+create_table_query = """
+    CREATE TABLE IF NOT EXISTS snake (
+        user_login VARCHAR(255),
+        last_score BIGINT, 
+        last_level BIGINT, 
+        last_FPS BIGINT, 
+        snake_len BIGINT, 
+        wall_len BIGINT, 
+        snake_x BIGINT, 
+        snake_y BIGINT, 
+        record BIGINT
+    );
+"""
+
+cursor.execute(create_table_query)
+
+conn.commit()
+
 login_name = str(input('Pls enter your login: '))
-sql = f"select * from snakedata where user_login =\'{login_name}\'"
+sql = f"select * from snake where user_login =\'{login_name}\'"
 cursor.execute(sql)
 info = cursor.fetchall()
 
@@ -132,7 +150,7 @@ if len(info) > 0:
 
 else:
     print("this login didnt regestrated, So now you have new acount")
-    sql_insert = f"INSERT INTO snakedata(user_login, last_score, last_level, last_FPS, snake_len, wall_len, snake_x, snake_y, record) VALUES( \'{login_name}\',\'{score_value}\',\'{level_value}\',\'{FPS}\', \'{snake_len}\', \'{wall_len}\',\'{body[0][0]}\', \'{body[0][1]}\', \'{record}\' )"
+    sql_insert = f"INSERT INTO snake(user_login, last_score, last_level, last_FPS, snake_len, wall_len, snake_x, snake_y, record) VALUES( \'{login_name}\',\'{score_value}\',\'{level_value}\',\'{FPS}\', \'{snake_len}\', \'{wall_len}\',\'{body[0][0]}\', \'{body[0][1]}\', \'{record}\' )"
     cursor.execute(sql_insert)
 
 
@@ -146,10 +164,10 @@ def GAME_OVER():
     screen.blit(text2, (850,35))
     screen.blit(text3, (850,65))
     screen.blit(text4, (425,225))
-    sql_insert1 = f"UPDATE snakedata set  last_score = 0, last_level = 1, last_FPS = 10, snake_len = 1, wall_len = 0, snake_x=10, snake_y=10  where user_login = \'{login_name}\' "
+    sql_insert1 = f"UPDATE snake set  last_score = 0, last_level = 1, last_FPS = 10, snake_len = 1, wall_len = 0, snake_x=10, snake_y=10  where user_login = \'{login_name}\' "
     cursor.execute(sql_insert1)
     if score_value > record:
-        sql_insert1 = f"UPDATE snakedata set record = \'{score_value}\'  where user_login = \'{login_name}\' "
+        sql_insert1 = f"UPDATE snake set record = \'{score_value}\'  where user_login = \'{login_name}\' "
         record = score_value
         cursor.execute(sql_insert1)
   
@@ -194,7 +212,7 @@ while running:
 
             if event.key == pygame.K_p:
                 print("PAUSE")
-                sql_insert = f"UPDATE snakedata set last_score =\'{score_value}\',last_level =\'{level_value}\',last_FPS =\'{FPS}\',snake_len=\'{snake_len}\',wall_len=\'{wall_len}\', snake_x=\'{body[0][0]}\', snake_y=\'{body[0][1]}\', record = \'{record}\' where user_login = \'{login_name}\'; "
+                sql_insert = f"UPDATE snake set last_score =\'{score_value}\',last_level =\'{level_value}\',last_FPS =\'{FPS}\',snake_len=\'{snake_len}\',wall_len=\'{wall_len}\', snake_x=\'{body[0][0]}\', snake_y=\'{body[0][1]}\', record = \'{record}\' where user_login = \'{login_name}\'; "
                 cursor.execute(sql_insert)
                 running = False
                 
